@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Dashboard - SIWESConnect</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            SIWES<span>Connect</span>
+        </div>
+
+        <div class="nav-links">
+
+            <span>
+                Welcome, {{ user.full_name }}
+            </span>
+
+            <a href="{{ url_for('auth.logout') }}"
+               class="nav-button">
+                Logout
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <section class="dashboard">
+
+        <h1>Admin Dashboard</h1>
+
+        <p>
+            Platform overview for SIWESConnect.
+        </p>
+
+
+        <div class="dashboard-cards">
+
+            <div class="dashboard-card">
+                <h3>Students</h3>
+                <p style="font-size: 32px; color: #1e3a5f; font-weight: bold;">
+                    {{ stats.total_students }}
+                </p>
+            </div>
+
+            <div class="dashboard-card">
+                <h3>Companies</h3>
+                <p style="font-size: 32px; color: #1e3a5f; font-weight: bold;">
+                    {{ stats.total_companies }}
+                </p>
+            </div>
+
+            <div class="dashboard-card">
+                <h3>Pending Companies</h3>
+                <p style="font-size: 32px; color: #b45309; font-weight: bold;">
+                    {{ stats.pending_companies }}
+                </p>
+            </div>
+
+            <div class="dashboard-card">
+                <h3>Opportunities Posted</h3>
+                <p style="font-size: 32px; color: #1e3a5f; font-weight: bold;">
+                    {{ stats.total_opportunities }}
+                </p>
+            </div>
+
+            <div class="dashboard-card">
+                <h3>Total Applications</h3>
+                <p style="font-size: 32px; color: #1e3a5f; font-weight: bold;">
+                    {{ stats.total_applications }}
+                </p>
+            </div>
+
+            <div class="dashboard-card">
+                <h3>Students Placed</h3>
+                <p style="font-size: 32px; color: #167a42; font-weight: bold;">
+                    {{ stats.students_placed }}
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="dashboard-cards"
+             style="margin-top: 25px;">
+
+            <a href="{{ url_for('admin.companies') }}"
+               class="dashboard-card">
+
+                <h3>Manage Companies</h3>
+
+                <p>
+                    Approve or suspend company accounts.
+                </p>
+
+            </a>
+
+            <a href="{{ url_for('admin.students') }}"
+               class="dashboard-card">
+
+                <h3>Manage Students</h3>
+
+                <p>
+                    View all registered students.
+                </p>
+
+            </a>
+
+            <a href="{{ url_for('admin.opportunities') }}"
+               class="dashboard-card">
+
+                <h3>Manage Opportunities</h3>
+
+                <p>
+                    View and remove posted opportunities.
+                </p>
+
+            </a>
+
+        </div>
+
+    </section>
+
+</body>
+
+</html>

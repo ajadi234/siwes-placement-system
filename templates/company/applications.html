@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Student Applications - SIWESConnect</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<!-- =========================
+     NAVIGATION
+========================= -->
+
+<nav class="navbar">
+
+    <div class="logo">
+        SIWES<span>Connect</span>
+    </div>
+
+
+    <div class="nav-links">
+
+        <a href="{{ url_for('company.dashboard') }}">
+            Dashboard
+        </a>
+
+        <a href="{{ url_for('company.profile') }}">
+            Profile
+        </a>
+
+        <a href="{{ url_for('auth.logout') }}"
+           class="nav-button">
+            Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+
+<!-- =========================
+     PAGE
+========================= -->
+
+<section class="dashboard">
+
+    <h1>
+        Student Applications
+    </h1>
+
+    <p>
+        Review students who have applied for your
+        SIWES and internship opportunities.
+    </p>
+
+
+
+    {% if applications %}
+
+
+        <div class="dashboard-cards">
+
+
+            {% for application in applications %}
+
+
+                {% set profile = application_profiles.get(application.id) %}
+
+
+                <div class="dashboard-card">
+
+
+                    <!-- OPPORTUNITY -->
+
+                    <h2>
+                        {{ application.opportunity.title }}
+                    </h2>
+
+
+                    <hr>
+
+
+                    <!-- STUDENT INFORMATION -->
+
+                    <h3>
+                        Student Information
+                    </h3>
+
+
+                    {% if application.student %}
+
+                        <p>
+                            <strong>Student Name:</strong>
+
+                            {{ application.student.full_name }}
+
+                        </p>
+
+                        <p>
+                            <strong>Email:</strong>
+
+                            {{ application.student.email }}
+
+                        </p>
+
+                    {% endif %}
+
+
+
+                    {% if profile %}
+
+
+                        <p>
+                            <strong>Matric Number:</strong>
+
+                            {{ profile.matric_number or "Not provided" }}
+
+                        </p>
+
+
+                        <p>
+                            <strong>Phone:</strong>
+
+                            {{ profile.phone or "Not provided" }}
+
+                        </p>
+
+
+                        <p>
+                            <strong>University:</strong>
+
+                            {{ profile.university or "Not provided" }}
+
+                        </p>
+
+
+                        <p>
+                            <strong>Faculty:</strong>
+
+                            {{ profile.faculty or "Not provided" }}
+
+                        </p>
+
+
+                        <p>
+                            <strong>Department:</strong>
+
+                            {{ profile.department or "Not provided" }}
+
+                        </p>
+
+
+                        <p>
+                            <strong>Programme:</strong>
+
+                            {{ profile.programme or "Not provided" }}
+
+                        </p>
+
+
+                        <p>
+                            <strong>Level:</strong>
+
+                            {{ profile.level or "Not provided" }}
+
+                        </p>
+
+
+                        <p>
+                            <strong>CGPA:</strong>
+
+                            {{ profile.cgpa or "Not provided" }}
+
+                        </p>
+
+
+                        <p>
+                            <strong>Skills:</strong>
+
+                            {{ profile.skills or "Not provided" }}
+
+                        </p>
+
+
+                        <p>
+                            <strong>Preferred State:</strong>
+
+                            {{ profile.preferred_state or "Not provided" }}
+
+                        </p>
+
+
+                        <p>
+                            <strong>Preferred City:</strong>
+
+                            {{ profile.preferred_city or "Not provided" }}
+
+                        </p>
+
+
+                    {% else %}
+
+
+                        <p>
+                            <strong>Student Profile:</strong>
+
+                            Student has not completed their profile.
+                        </p>
+
+
+                    {% endif %}
+
+
+
+                    <hr>
+
+
+
+                    <!-- APPLICATION INFORMATION -->
+
+                    <h3>
+                        Application Information
+                    </h3>
+
+
+                    <p>
+
+                        <strong>Application ID:</strong>
+
+                        {{ application.id }}
+
+                    </p>
+
+
+                    <p>
+
+                        <strong>Opportunity:</strong>
+
+                        {{ application.opportunity.title }}
+
+                    </p>
+
+
+                    <p>
+
+                        <strong>Location:</strong>
+
+                        {{ application.opportunity.location }}
+
+                    </p>
+
+
+                    <p>
+
+                        <strong>Applied:</strong>
+
+                        {{ application.created_at }}
+
+                    </p>
+
+
+                    <p>
+
+                        <strong>Status:</strong>
+
+                        {{ application.status }}
+
+                    </p>
+
+
+
+                    <!-- ACTIONS -->
+
+                    {% if application.status == "Pending" %}
+
+
+                        <div style="margin-top: 20px;">
+
+
+                            <form
+                                method="POST"
+                                action="{{ url_for(
+                                    'company.accept_application',
+                                    application_id=application.id
+                                ) }}"
+                                style="display:inline;">
+
+                                <input type="hidden"
+                                       name="csrf_token"
+                                       value="{{ csrf_token() }}">
+
+                                <button
+                                    type="submit"
+                                    class="primary-button">
+
+                                    Accept
+
+                                </button>
+
+                            </form>
+
+
+
+                            <form
+                                method="POST"
+                                action="{{ url_for(
+                                    'company.reject_application',
+                                    application_id=application.id
+                                ) }}"
+                                style="display:inline;">
+
+                                <input type="hidden"
+                                       name="csrf_token"
+                                       value="{{ csrf_token() }}">
+
+                                <button
+                                    type="submit"
+                                    class="primary-button">
+
+                                    Reject
+
+                                </button>
+
+                            </form>
+
+
+                        </div>
+
+
+                    {% elif application.status == "Accepted" %}
+
+
+                        <p>
+
+                            <strong>
+                                Application Accepted
+                            </strong>
+
+                        </p>
+
+
+                    {% elif application.status == "Rejected" %}
+
+
+                        <p>
+
+                            <strong>
+                                Application Rejected
+                            </strong>
+
+                        </p>
+
+
+                    {% endif %}
+
+
+                </div>
+
+
+            {% endfor %}
+
+
+        </div>
+
+
+    {% else %}
+
+
+        <div class="dashboard-card">
+
+            <h2>
+                No Applications Yet
+            </h2>
+
+            <p>
+                No student has applied for your opportunities yet.
+            </p>
+
+        </div>
+
+
+    {% endif %}
+
+
+</section>
+
+
+</body>
+
+</html>

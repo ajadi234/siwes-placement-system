@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Opportunities - SIWESConnect</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+
+<body>
+
+
+    <!-- NAVBAR -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+            SIWES<span>Connect</span>
+        </div>
+
+        <div class="nav-links">
+
+            <a href="{{ url_for('student.dashboard') }}">
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('student.profile') }}">
+                Profile
+            </a>
+
+            <a href="{{ url_for('student.applications') }}">
+                My Applications
+            </a>
+
+            <a href="{{ url_for('auth.logout') }}"
+               class="nav-button">
+                Logout
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- PAGE -->
+
+    <section class="dashboard">
+
+        <h1>
+            Available SIWES & Internship Opportunities
+        </h1>
+
+        <p>
+            Find internship and SIWES placement opportunities
+            posted by companies.
+        </p>
+
+
+        {% if opportunities %}
+
+            <div class="dashboard-cards">
+
+                {% for opportunity in opportunities %}
+
+                    <div class="dashboard-card">
+
+                        <h2>
+                            {{ opportunity.title }}
+                        </h2>
+
+
+                        <p>
+                            <strong>Type:</strong>
+                            {{ opportunity.opportunity_type }}
+                        </p>
+
+
+                        <p>
+                            <strong>Location:</strong>
+                            {{ opportunity.location }}
+                        </p>
+
+
+                        <p>
+                            <strong>State:</strong>
+                            {{ opportunity.state }}
+                        </p>
+
+
+                        <p>
+                            <strong>City:</strong>
+                            {{ opportunity.city }}
+                        </p>
+
+
+                        <p>
+                            <strong>Duration:</strong>
+                            {{ opportunity.duration }}
+                        </p>
+
+
+                        <p>
+                            <strong>Description:</strong>
+                        </p>
+
+                        <p>
+                            {{ opportunity.description }}
+                        </p>
+
+
+                        {% if opportunity.requirements %}
+
+                            <p>
+                                <strong>
+                                    Required Skills:
+                                </strong>
+                            </p>
+
+                            <p>
+                                {{ opportunity.requirements }}
+                            </p>
+
+                        {% endif %}
+
+
+                        {% if opportunity.application_deadline %}
+
+                            <p>
+
+                                <strong>
+                                    Application Deadline:
+                                </strong>
+
+                                {{ opportunity.application_deadline }}
+
+                            </p>
+
+                        {% endif %}
+
+
+                        <!-- APPLY BUTTON -->
+
+                        {% if opportunity.id in applied_ids %}
+
+                            <button
+                                class="primary-button"
+                                disabled>
+
+                                Already Applied
+
+                            </button>
+
+                        {% else %}
+
+                            <form
+                                method="POST"
+                                action="{{ url_for(
+                                    'student.apply',
+                                    opportunity_id=opportunity.id
+                                ) }}">
+
+                                <input type="hidden"
+                                       name="csrf_token"
+                                       value="{{ csrf_token() }}">
+
+                                <button
+                                    type="submit"
+                                    class="primary-button">
+
+                                    Apply Now
+
+                                </button>
+
+                            </form>
+
+                        {% endif %}
+
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="dashboard-card">
+
+                <h2>
+                    No Opportunities Available
+                </h2>
+
+                <p>
+                    There are currently no SIWES or internship
+                    opportunities posted by companies.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+</body>
+
+</html>

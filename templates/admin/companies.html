@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Manage Companies - SIWESConnect</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            SIWES<span>Connect</span>
+        </div>
+
+        <div class="nav-links">
+
+            <a href="{{ url_for('admin.dashboard') }}">
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('auth.logout') }}"
+               class="nav-button">
+                Logout
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <section class="dashboard">
+
+        <h1>Manage Companies</h1>
+
+        <p>
+            Approve new company accounts or suspend existing ones.
+        </p>
+
+
+        {% with messages = get_flashed_messages() %}
+
+            {% if messages %}
+
+                {% for message in messages %}
+
+                    <div class="success-message">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        {% if company_users %}
+
+            <div class="dashboard-cards">
+
+                {% for company_user in company_users %}
+
+                    {% set profile = company_profiles.get(company_user.id) %}
+
+                    <div class="dashboard-card">
+
+                        <h2>
+                            {{ company_user.full_name }}
+                        </h2>
+
+                        <p>
+                            <strong>Email:</strong>
+                            {{ company_user.email }}
+                        </p>
+
+                        {% if profile %}
+
+                            <p>
+                                <strong>Organization:</strong>
+                                {{ profile.organization_name }}
+                            </p>
+
+                            <p>
+                                <strong>Type:</strong>
+                                {{ profile.organization_type }}
+                            </p>
+
+                            <p>
+                                <strong>Contact Person:</strong>
+                                {{ profile.contact_person }}
+                            </p>
+
+                            <p>
+                                <strong>Phone:</strong>
+                                {{ profile.phone }}
+                            </p>
+
+                            <p>
+                                <strong>Address:</strong>
+                                {{ profile.address }}
+                            </p>
+
+                            <p>
+                                <strong>Location:</strong>
+                                {{ profile.city }}, {{ profile.state }}
+                            </p>
+
+                            <p>
+                                <strong>Website:</strong>
+
+                                {% if profile.website %}
+
+                                    <a href="{{ profile.website }}"
+                                       target="_blank"
+                                       rel="noopener noreferrer">
+
+                                        {{ profile.website }}
+
+                                    </a>
+
+                                {% else %}
+
+                                    Not provided
+
+                                {% endif %}
+
+                            </p>
+
+                            {% if profile.description %}
+
+                                <p>
+                                    <strong>About:</strong>
+                                    {{ profile.description }}
+                                </p>
+
+                            {% endif %}
+
+                        {% else %}
+
+                            <p>
+                                Company has not completed their profile.
+                                Consider waiting for profile completion
+                                before approving.
+                            </p>
+
+                        {% endif %}
+
+                        <p>
+                            <strong>Status:</strong>
+
+                            {% if company_user.is_approved %}
+                                <span style="color: #167a42; font-weight: bold;">
+                                    Approved
+                                </span>
+                            {% else %}
+                                <span style="color: #b45309; font-weight: bold;">
+                                    Pending
+                                </span>
+                            {% endif %}
+                        </p>
+
+
+                        <div style="margin-top: 15px;">
+
+                            {% if not company_user.is_approved %}
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for('admin.approve_company', user_id=company_user.id) }}"
+                                    style="display:inline;">
+
+                                    <input type="hidden"
+                                           name="csrf_token"
+                                           value="{{ csrf_token() }}">
+
+                                    <button type="submit"
+                                            class="primary-button">
+                                        Approve
+                                    </button>
+
+                                </form>
+
+                            {% else %}
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for('admin.suspend_company', user_id=company_user.id) }}"
+                                    style="display:inline;">
+
+                                    <input type="hidden"
+                                           name="csrf_token"
+                                           value="{{ csrf_token() }}">
+
+                                    <button type="submit"
+                                            class="primary-button">
+                                        Suspend
+                                    </button>
+
+                                </form>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="dashboard-card">
+                <h2>No Companies Registered Yet</h2>
+            </div>
+
+        {% endif %}
+
+    </section>
+
+</body>
+
+</html>

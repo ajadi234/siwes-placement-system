@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>My Students - SIWESConnect</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<!-- =========================
+     NAVIGATION
+========================= -->
+
+<nav class="navbar">
+
+    <div class="logo">
+        SIWES<span>Connect</span>
+    </div>
+
+
+    <div class="nav-links">
+
+        <a href="{{ url_for('company.dashboard') }}">
+            Dashboard
+        </a>
+
+        <a href="{{ url_for('company.applications') }}">
+            Applications
+        </a>
+
+        <a href="{{ url_for('company.profile') }}">
+            Profile
+        </a>
+
+        <a href="{{ url_for('auth.logout') }}"
+           class="nav-button">
+            Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+
+<!-- =========================
+     PAGE
+========================= -->
+
+<section class="dashboard">
+
+    <h1>
+        My Students
+    </h1>
+
+    <p>
+        Students currently placed in your organization
+        through SIWESConnect.
+    </p>
+
+
+
+    {% if placed_applications %}
+
+
+        <div class="dashboard-cards">
+
+
+            {% for application in placed_applications %}
+
+
+                {% set profile = student_profiles.get(application.id) %}
+
+
+                <div class="dashboard-card">
+
+
+                    <!-- STUDENT NAME -->
+
+                    <h2>
+                        {{ application.student.full_name }}
+                    </h2>
+
+
+                    <p>
+                        <strong>Placed under:</strong>
+                        {{ application.opportunity.title }}
+                    </p>
+
+
+                    <hr>
+
+
+                    <!-- CONTACT -->
+
+                    <p>
+                        <strong>Email:</strong>
+                        {{ application.student.email }}
+                    </p>
+
+
+                    {% if profile %}
+
+
+                        <p>
+                            <strong>Phone:</strong>
+                            {{ profile.phone or "Not provided" }}
+                        </p>
+
+
+                        <p>
+                            <strong>Matric Number:</strong>
+                            {{ profile.matric_number or "Not provided" }}
+                        </p>
+
+
+                        <p>
+                            <strong>University:</strong>
+                            {{ profile.university or "Not provided" }}
+                        </p>
+
+
+                        <p>
+                            <strong>Department:</strong>
+                            {{ profile.department or "Not provided" }}
+                        </p>
+
+
+                        <p>
+                            <strong>Level:</strong>
+                            {{ profile.level or "Not provided" }}
+                        </p>
+
+
+                    {% else %}
+
+
+                        <p>
+                            Student has not completed their profile.
+                        </p>
+
+
+                    {% endif %}
+
+
+                    <hr>
+
+
+                    <p>
+                        <strong>Placed since:</strong>
+                        {{ application.created_at }}
+                    </p>
+
+
+                    {% if application.start_date and application.end_date %}
+
+                        <p>
+                            <strong>Start Date:</strong>
+                            {{ application.start_date.strftime("%d %B %Y") }}
+                        </p>
+
+                        <p>
+                            <strong>End Date:</strong>
+                            {{ application.end_date.strftime("%d %B %Y") }}
+                        </p>
+
+                    {% else %}
+
+                        <p>
+                            <strong>Placement Dates:</strong>
+                            Not yet set by the student.
+                        </p>
+
+                    {% endif %}
+
+
+                </div>
+
+
+            {% endfor %}
+
+
+        </div>
+
+
+    {% else %}
+
+
+        <div class="dashboard-card">
+
+            <h2>
+                No Students Placed Yet
+            </h2>
+
+            <p>
+                Once you accept a student's application, they will
+                appear here as one of your placed students.
+            </p>
+
+        </div>
+
+
+    {% endif %}
+
+
+</section>
+
+
+</body>
+
+</html>

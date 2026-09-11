@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Manage Opportunities - SIWESConnect</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            SIWES<span>Connect</span>
+        </div>
+
+        <div class="nav-links">
+
+            <a href="{{ url_for('admin.dashboard') }}">
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('auth.logout') }}"
+               class="nav-button">
+                Logout
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <section class="dashboard">
+
+        <h1>Manage Opportunities</h1>
+
+        <p>
+            All opportunities posted across SIWESConnect.
+        </p>
+
+
+        {% with messages = get_flashed_messages() %}
+
+            {% if messages %}
+
+                {% for message in messages %}
+
+                    <div class="success-message">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        {% if opportunities %}
+
+            <div class="dashboard-cards">
+
+                {% for opportunity in opportunities %}
+
+                    <div class="dashboard-card">
+
+                        <h2>
+                            {{ opportunity.title }}
+                        </h2>
+
+                        <p>
+                            <strong>Type:</strong>
+                            {{ opportunity.opportunity_type }}
+                        </p>
+
+                        <p>
+                            <strong>Location:</strong>
+                            {{ opportunity.location }}
+                        </p>
+
+                        <p>
+                            <strong>Duration:</strong>
+                            {{ opportunity.duration }}
+                        </p>
+
+                        <p>
+                            <strong>Posted:</strong>
+                            {{ opportunity.created_at }}
+                        </p>
+
+
+                        <form
+                            method="POST"
+                            action="{{ url_for('admin.delete_opportunity', opportunity_id=opportunity.id) }}"
+                            style="margin-top: 15px;"
+                            onsubmit="return confirm('Remove this opportunity? This cannot be undone.');">
+
+                            <input type="hidden"
+                                   name="csrf_token"
+                                   value="{{ csrf_token() }}">
+
+                            <button type="submit"
+                                    class="primary-button">
+                                Remove Opportunity
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="dashboard-card">
+                <h2>No Opportunities Posted Yet</h2>
+            </div>
+
+        {% endif %}
+
+    </section>
+
+</body>
+
+</html>

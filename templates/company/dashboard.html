@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Company Dashboard - SIWESConnect</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+
+        <div class="logo">
+            SIWES<span>Connect</span>
+        </div>
+
+        <div class="nav-links">
+
+            <span>
+                Welcome, {{ user.full_name }}
+            </span>
+
+            <a href="{{ url_for('auth.logout') }}"
+               class="nav-button">
+                Logout
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- Dashboard -->
+    <section class="dashboard">
+
+        <h1>Company Dashboard</h1>
+
+        <p>
+            Welcome back, {{ user.full_name }}.
+            Manage your internship and SIWES opportunities.
+        </p>
+
+
+        {% if not user.is_approved %}
+
+            <div class="success-message"
+                 style="background: #fff4e5; color: #b45309;">
+
+                Your account is pending admin approval. You'll
+                be able to post opportunities once approved.
+
+            </div>
+
+        {% endif %}
+
+
+        <div class="dashboard-cards">
+
+
+            <!-- Post Opportunity -->
+            <div class="dashboard-card">
+
+                <div class="feature-icon">
+                    ➕
+                </div>
+
+                <h3>Post Opportunity</h3>
+
+                <p>
+                    Create a new internship or
+                    SIWES placement opportunity.
+                </p>
+
+                <br>
+
+                <a href="{{ url_for('company.create_opportunity') }}"
+                   class="primary-button">
+
+                    Post Opportunity
+
+                </a>
+
+            </div>
+
+
+            <!-- Applications -->
+            <a href="{{ url_for('company.applications') }}"
+               class="dashboard-card">
+
+                <div class="feature-icon">
+                    📋
+                </div>
+
+                <h3>Applications</h3>
+
+                <p>
+                    View students who have applied for your
+                    opportunities, and accept or reject them.
+                </p>
+
+            </a>
+
+
+            <!-- Students -->
+            <a href="{{ url_for('company.students') }}"
+               class="dashboard-card">
+
+                <div class="feature-icon">
+                    👨‍🎓
+                </div>
+
+                <h3>Students</h3>
+
+                <p>
+                    View students currently placed
+                    in your organization.
+                </p>
+
+            </a>
+
+
+            <!-- Organization Profile -->
+            <div class="dashboard-card">
+
+                <div class="feature-icon">
+                    🏢
+                </div>
+
+                <h3>Organization Profile</h3>
+
+                <p>
+                    Manage your organization's information
+                    and contact details.
+                </p>
+
+                <br>
+
+                <a href="{{ url_for('company.profile') }}"
+                   class="primary-button">
+
+                    Complete Profile
+
+                </a>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+</body>
+
+</html>

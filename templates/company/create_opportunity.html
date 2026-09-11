@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Post Opportunity - SIWESConnect</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            SIWES<span>Connect</span>
+        </div>
+
+        <div class="nav-links">
+
+            <a href="{{ url_for('company.dashboard') }}">
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('auth.logout') }}"
+               class="nav-button">
+                Logout
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <section class="profile-page">
+
+        <div class="profile-header">
+
+            <h1>
+                Post SIWES / Internship Opportunity
+            </h1>
+
+            <p>
+                Create an opportunity for students to apply.
+            </p>
+
+        </div>
+
+
+        <form method="POST"
+              class="profile-form">
+
+            <input type="hidden"
+                   name="csrf_token"
+                   value="{{ csrf_token() }}">
+
+
+            <h2>Opportunity Information</h2>
+
+
+            <label>
+                Opportunity Title
+            </label>
+
+            <input
+                type="text"
+                name="title"
+                placeholder="e.g. Software Developer Intern"
+                required
+            >
+
+
+            <label>
+                Opportunity Type
+            </label>
+
+            <select name="opportunity_type" required>
+
+                <option value="">
+                    Select Type
+                </option>
+
+                <option value="SIWES">
+                    SIWES
+                </option>
+
+                <option value="Internship">
+                    Internship
+                </option>
+
+                <option value="Industrial Training">
+                    Industrial Training
+                </option>
+
+            </select>
+
+
+            <label>
+                Description
+            </label>
+
+            <textarea
+                name="description"
+                rows="6"
+                placeholder="Describe the opportunity..."
+                required
+            ></textarea>
+
+
+            <label>
+                Required Skills
+            </label>
+
+            <textarea
+                name="requirements"
+                rows="5"
+                placeholder="e.g. Python, Flask, HTML, CSS, SQL"
+            ></textarea>
+
+
+            <h2>Location</h2>
+
+
+            <label>
+                Address / Location
+            </label>
+
+            <input
+                type="text"
+                name="location"
+                placeholder="e.g. HiiT Training Centre, Ibadan"
+                required
+            >
+
+
+            <label>
+                State
+            </label>
+
+            <input
+                type="text"
+                name="state"
+                placeholder="e.g. Oyo"
+                required
+            >
+
+
+            <label>
+                City
+            </label>
+
+            <input
+                type="text"
+                name="city"
+                placeholder="e.g. Ibadan"
+                required
+            >
+
+
+            <h2>Placement Details</h2>
+
+
+            <label>
+                Duration
+            </label>
+
+            <input
+                type="text"
+                name="duration"
+                placeholder="e.g. 6 Months"
+                required
+            >
+
+
+            <label>
+                Application Deadline
+            </label>
+
+            <input
+                type="date"
+                name="application_deadline"
+            >
+
+
+            <button
+                type="submit"
+                class="primary-button">
+
+                Post Opportunity
+
+            </button>
+
+        </form>
+
+    </section>
+
+</body>
+
+</html>ss

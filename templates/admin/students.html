@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Manage Students - SIWESConnect</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            SIWES<span>Connect</span>
+        </div>
+
+        <div class="nav-links">
+
+            <a href="{{ url_for('admin.dashboard') }}">
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('auth.logout') }}"
+               class="nav-button">
+                Logout
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <section class="dashboard">
+
+        <h1>Manage Students</h1>
+
+        <p>
+            All students registered on SIWESConnect.
+        </p>
+
+
+        {% if student_users %}
+
+            <div class="dashboard-cards">
+
+                {% for student_user in student_users %}
+
+                    {% set profile = student_profiles.get(student_user.id) %}
+
+                    <div class="dashboard-card">
+
+                        <h2>
+                            {{ student_user.full_name }}
+                        </h2>
+
+                        <p>
+                            <strong>Email:</strong>
+                            {{ student_user.email }}
+                        </p>
+
+                        {% if profile %}
+
+                            <p>
+                                <strong>Matric Number:</strong>
+                                {{ profile.matric_number }}
+                            </p>
+
+                            <p>
+                                <strong>University:</strong>
+                                {{ profile.university }}
+                            </p>
+
+                            <p>
+                                <strong>Department:</strong>
+                                {{ profile.department }}
+                            </p>
+
+                            <p>
+                                <strong>Level:</strong>
+                                {{ profile.level }}
+                            </p>
+
+                            <p>
+                                <strong>CGPA:</strong>
+                                {{ profile.cgpa or "Not provided" }}
+                            </p>
+
+                        {% else %}
+
+                            <p>
+                                Student has not completed their profile.
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="dashboard-card">
+                <h2>No Students Registered Yet</h2>
+            </div>
+
+        {% endif %}
+
+    </section>
+
+</body>
+
+</html>

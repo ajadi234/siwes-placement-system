@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>My Applications - SIWESConnect</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+
+<body>
+
+
+    <nav class="navbar">
+
+        <div class="logo">
+            SIWES<span>Connect</span>
+        </div>
+
+        <div class="nav-links">
+
+            <a href="{{ url_for('student.dashboard') }}">
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('student.opportunities') }}">
+                Opportunities
+            </a>
+
+            <a href="{{ url_for('student.profile') }}">
+                Profile
+            </a>
+
+            <a href="{{ url_for('auth.logout') }}"
+               class="nav-button">
+                Logout
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <section class="dashboard">
+
+        <h1>
+            My Applications
+        </h1>
+
+        <p>
+            View the SIWES and internship opportunities
+            you have applied for.
+        </p>
+
+
+        {% if applications %}
+
+            <div class="dashboard-cards">
+
+                {% for application in applications %}
+
+                    <div class="dashboard-card">
+
+                        <h2>
+                            {{ application.opportunity.title }}
+                        </h2>
+
+
+                        <p>
+
+                            <strong>Type:</strong>
+
+                            {{ application.opportunity.opportunity_type }}
+
+                        </p>
+
+
+                        <p>
+
+                            <strong>Location:</strong>
+
+                            {{ application.opportunity.location }}
+
+                        </p>
+
+
+                        <p>
+
+                            <strong>State:</strong>
+
+                            {{ application.opportunity.state }}
+
+                        </p>
+
+
+                        <p>
+
+                            <strong>City:</strong>
+
+                            {{ application.opportunity.city }}
+
+                        </p>
+
+
+                        <p>
+
+                            <strong>Applied:</strong>
+
+                            {{ application.created_at }}
+
+                        </p>
+
+
+                        <p>
+
+                            <strong>Status:</strong>
+
+                            {% if application.status == "Pending" %}
+
+                                <span>
+                                    Pending
+                                </span>
+
+                            {% elif application.status == "Accepted" %}
+
+                                <span>
+                                    Accepted
+                                </span>
+
+                            {% elif application.status == "Rejected" %}
+
+                                <span>
+                                    Rejected
+                                </span>
+
+                            {% endif %}
+
+                        </p>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+        {% else %}
+
+            <div class="dashboard-card">
+
+                <h2>
+                    No Applications Yet
+                </h2>
+
+                <p>
+                    You have not applied for any opportunity yet.
+                </p>
+
+                <br>
+
+                <a
+                    href="{{ url_for('student.opportunities') }}"
+                    class="primary-button">
+
+                    Find Opportunities
+
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+</body>
+
+</html>

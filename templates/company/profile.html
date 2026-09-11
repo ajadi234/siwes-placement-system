@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Company Profile - SIWESConnect</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            SIWES<span>Connect</span>
+        </div>
+
+        <div class="nav-links">
+
+            <a href="{{ url_for('company.dashboard') }}">
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('auth.logout') }}"
+               class="nav-button">
+                Logout
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <section class="profile-page">
+
+        <div class="profile-header">
+
+            <h1>Company Profile</h1>
+
+            <p>
+                Complete your organization profile so students
+                can learn more about your company.
+            </p>
+
+        </div>
+
+
+        {% with messages = get_flashed_messages() %}
+
+            {% if messages %}
+
+                {% for message in messages %}
+
+                    <div class="success-message">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <form method="POST"
+              class="profile-form">
+
+            <input type="hidden"
+                   name="csrf_token"
+                   value="{{ csrf_token() }}">
+
+
+            <h2>Organization Information</h2>
+
+
+            <label>Organization Name</label>
+
+            <input
+                type="text"
+                name="organization_name"
+                value="{{ profile.organization_name if profile else '' }}"
+                placeholder="e.g. ABC Technologies"
+                required
+            >
+
+
+            <label>Organization Type</label>
+
+            <select name="organization_type" required>
+
+                <option value="">
+                    Select Organization Type
+                </option>
+
+                <option value="Technology"
+                    {% if profile and profile.organization_type == "Technology" %}selected{% endif %}>
+                    Technology
+                </option>
+
+                <option value="Banking"
+                    {% if profile and profile.organization_type == "Banking" %}selected{% endif %}>
+                    Banking / Finance
+                </option>
+
+                <option value="Telecommunications"
+                    {% if profile and profile.organization_type == "Telecommunications" %}selected{% endif %}>
+                    Telecommunications
+                </option>
+
+                <option value="Government"
+                    {% if profile and profile.organization_type == "Government" %}selected{% endif %}>
+                    Government
+                </option>
+
+                <option value="Education"
+                    {% if profile and profile.organization_type == "Education" %}selected{% endif %}>
+                    Education
+                </option>
+
+                <option value="Other"
+                    {% if profile and profile.organization_type == "Other" %}selected{% endif %}>
+                    Other
+                </option>
+
+            </select>
+
+
+            <label>Contact Person</label>
+
+            <input
+                type="text"
+                name="contact_person"
+                value="{{ profile.contact_person if profile else '' }}"
+                placeholder="Full name of contact person"
+                required
+            >
+
+
+            <label>Phone Number</label>
+
+            <input
+                type="tel"
+                name="phone"
+                value="{{ profile.phone if profile else '' }}"
+                placeholder="08012345678"
+                required
+            >
+
+
+            <h2>Location</h2>
+
+
+            <label>Address</label>
+
+            <input
+                type="text"
+                name="address"
+                value="{{ profile.address if profile else '' }}"
+                placeholder="Organization address"
+                required
+            >
+
+
+            <label>State</label>
+
+            <input
+                type="text"
+                name="state"
+                value="{{ profile.state if profile else '' }}"
+                placeholder="e.g. Lagos"
+                required
+            >
+
+
+            <label>City</label>
+
+            <input
+                type="text"
+                name="city"
+                value="{{ profile.city if profile else '' }}"
+                placeholder="e.g. Ikeja"
+                required
+            >
+
+
+            <label>Website</label>
+
+            <input
+                type="url"
+                name="website"
+                value="{{ profile.website if profile else '' }}"
+                placeholder="https://example.com"
+            >
+
+
+            <h2>About Organization</h2>
+
+
+            <label>Description</label>
+
+            <textarea
+                name="description"
+                rows="6"
+                placeholder="Tell students about your organization..."
+            >{{ profile.description if profile else '' }}</textarea>
+
+
+            <button
+                type="submit"
+                class="primary-button">
+
+                Save Company Profile
+
+            </button>
+
+        </form>
+
+    </section>
+
+</body>
+
+</html>

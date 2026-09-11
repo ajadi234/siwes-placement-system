@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Dashboard - SIWESConnect</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+
+        <div class="logo">
+            SIWES<span>Connect</span>
+        </div>
+
+        <div class="nav-links">
+
+            <span>
+                Welcome, {{ user.full_name }}
+            </span>
+
+            <a href="{{ url_for('auth.logout') }}"
+               class="nav-button">
+                Logout
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- Dashboard -->
+    <section class="dashboard">
+
+        <h1>Student Dashboard</h1>
+
+        <p>
+            Welcome back, {{ user.full_name }}.
+            Manage your SIWES placement from here.
+        </p>
+
+
+        <div class="dashboard-cards">
+
+
+            <!-- Find Opportunities -->
+            <a href="{{ url_for('student.opportunities') }}"
+               class="dashboard-card">
+
+                <div class="card-icon">
+                    🔍
+                </div>
+
+                <h2>
+                    Find Opportunities
+                </h2>
+
+                <p>
+                    Search for available internship and
+                    SIWES opportunities.
+                </p>
+
+            </a>
+
+
+            <!-- My Applications -->
+            <a href="{{ url_for('student.applications') }}"
+               class="dashboard-card">
+
+                <div class="feature-icon">
+                    📝
+                </div>
+
+                <h3>My Applications</h3>
+
+                <p>
+                    View and track all your
+                    submitted applications.
+                </p>
+
+            </a>
+
+
+            <!-- My Placement -->
+            <a href="{{ url_for('student.placement') }}"
+               class="dashboard-card">
+
+                <div class="feature-icon">
+                    🏢
+                </div>
+
+                <h3>My Placement</h3>
+
+                <p>
+                    View information about your
+                    current SIWES placement.
+                </p>
+
+            </a>
+
+
+            <!-- My Profile -->
+            <div class="dashboard-card">
+
+                <div class="feature-icon">
+                    👤
+                </div>
+
+                <h3>My Profile</h3>
+
+                <p>
+                    Complete and update your student profile.
+                </p>
+
+                <br>
+
+                <a href="{{ url_for('student.profile') }}"
+                   class="primary-button">
+
+                    Complete Profile
+
+                </a>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+</body>
+
+</html>ss

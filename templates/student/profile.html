@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>My Profile - SIWESConnect</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            SIWES<span>Connect</span>
+        </div>
+
+        <div class="nav-links">
+
+            <a href="{{ url_for('student.dashboard') }}">
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('auth.logout') }}"
+               class="nav-button">
+                Logout
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <section class="profile-page">
+
+        <div class="profile-header">
+
+            <h1>
+                Student Profile
+            </h1>
+
+            <p>
+                Complete your profile so we can help you
+                find suitable SIWES opportunities.
+            </p>
+
+        </div>
+
+
+        {% with messages = get_flashed_messages() %}
+
+            {% if messages %}
+
+                {% for message in messages %}
+
+                    <div class="success-message">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <form method="POST"
+              class="profile-form">
+
+            <input type="hidden"
+                   name="csrf_token"
+                   value="{{ csrf_token() }}">
+
+
+            <h2>Academic Information</h2>
+
+
+            <label>Matric Number</label>
+
+            <input
+                type="text"
+                name="matric_number"
+                value="{{ profile.matric_number if profile else '' }}"
+                required
+            >
+
+
+            <label>University</label>
+
+            <input
+                type="text"
+                name="university"
+                value="{{ profile.university if profile else '' }}"
+                placeholder="e.g. University of Ilesa"
+                required
+            >
+
+
+            <label>Faculty</label>
+
+            <input
+                type="text"
+                name="faculty"
+                value="{{ profile.faculty if profile else '' }}"
+                required
+            >
+
+
+            <label>Department</label>
+
+            <input
+                type="text"
+                name="department"
+                value="{{ profile.department if profile else '' }}"
+                required
+            >
+
+
+            <label>Programme</label>
+
+            <input
+                type="text"
+                name="programme"
+                value="{{ profile.programme if profile else '' }}"
+                placeholder="e.g. Software Engineering"
+                required
+            >
+
+
+            <label>Level</label>
+
+            <select name="level" required>
+
+                <option value="">Select Level</option>
+
+                <option value="100"
+                    {% if profile and profile.level == "100" %}selected{% endif %}>
+                    100 Level
+                </option>
+
+                <option value="200"
+                    {% if profile and profile.level == "200" %}selected{% endif %}>
+                    200 Level
+                </option>
+
+                <option value="300"
+                    {% if profile and profile.level == "300" %}selected{% endif %}>
+                    300 Level
+                </option>
+
+                <option value="400"
+                    {% if profile and profile.level == "400" %}selected{% endif %}>
+                    400 Level
+                </option>
+
+                <option value="500"
+                    {% if profile and profile.level == "500" %}selected{% endif %}>
+                    500 Level
+                </option>
+
+            </select>
+
+
+            <label>CGPA</label>
+
+            <input
+                type="number"
+                name="cgpa"
+                step="0.01"
+                min="0"
+                max="5"
+                value="{{ profile.cgpa if profile and profile.cgpa is not none else '' }}"
+                placeholder="e.g. 4.50"
+            >
+
+
+            <h2>Contact Information</h2>
+
+
+            <label>Phone Number</label>
+
+            <input
+                type="tel"
+                name="phone"
+                value="{{ profile.phone if profile else '' }}"
+                placeholder="08012345678"
+                required
+            >
+
+
+            <h2>Skills & Placement Preferences</h2>
+
+
+            <label>Skills</label>
+
+            <textarea
+                name="skills"
+                rows="5"
+                placeholder="e.g. Python, Flask, HTML, CSS, JavaScript"
+            >{{ profile.skills if profile else '' }}</textarea>
+
+
+            <label>Preferred State</label>
+
+            <input
+                type="text"
+                name="preferred_state"
+                value="{{ profile.preferred_state if profile else '' }}"
+                placeholder="e.g. Osun"
+            >
+
+
+            <label>Preferred City</label>
+
+            <input
+                type="text"
+                name="preferred_city"
+                value="{{ profile.preferred_city if profile else '' }}"
+                placeholder="e.g. Ilesa"
+            >
+
+
+            <button
+                type="submit"
+                class="primary-button">
+                Save Profile
+            </button>
+
+        </form>
+
+    </section>
+
+</body>
+
+</html>

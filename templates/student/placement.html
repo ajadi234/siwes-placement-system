@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>My Placement - SIWESConnect</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<!-- =========================
+     NAVIGATION
+========================= -->
+
+<nav class="navbar">
+
+    <div class="logo">
+        SIWES<span>Connect</span>
+    </div>
+
+
+    <div class="nav-links">
+
+        <a href="{{ url_for('student.dashboard') }}">
+            Dashboard
+        </a>
+
+        <a href="{{ url_for('student.opportunities') }}">
+            Opportunities
+        </a>
+
+        <a href="{{ url_for('student.applications') }}">
+            My Applications
+        </a>
+
+        <a href="{{ url_for('auth.logout') }}"
+           class="nav-button">
+            Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+
+<!-- =========================
+     PAGE
+========================= -->
+
+<section class="dashboard">
+
+    <h1>
+        My Placement
+    </h1>
+
+    {% with messages = get_flashed_messages() %}
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+                <div class="success-message">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+    <p>
+        Information about your current SIWES / internship placement.
+    </p>
+
+
+
+    {% if accepted_applications %}
+
+
+        <div class="dashboard-cards">
+
+
+            {% for application in accepted_applications %}
+
+
+                {% set company_profile = placement_companies.get(application.id) %}
+
+
+                <div class="dashboard-card">
+
+
+                    <!-- OPPORTUNITY -->
+
+                    <h2>
+                        {{ application.opportunity.title }}
+                    </h2>
+
+
+                    <p>
+                        <strong>Type:</strong>
+                        {{ application.opportunity.opportunity_type }}
+                    </p>
+
+
+                    <hr>
+
+
+                    <!-- COMPANY INFORMATION -->
+
+                    <h3>
+                        Organization
+                    </h3>
+
+
+                    {% if company_profile %}
+
+
+                        <p>
+                            <strong>Organization Name:</strong>
+                            {{ company_profile.organization_name }}
+                        </p>
+
+
+                        <p>
+                            <strong>Contact Person:</strong>
+                            {{ company_profile.contact_person }}
+                        </p>
+
+
+                        <p>
+                            <strong>Phone:</strong>
+                            {{ company_profile.phone }}
+                        </p>
+
+
+                        <p>
+                            <strong>Address:</strong>
+                            {{ company_profile.address }}
+                        </p>
+
+
+                    {% else %}
+
+
+                        <p>
+                            Organization has not completed their profile.
+                        </p>
+
+
+                    {% endif %}
+
+
+                    <hr>
+
+
+                    <!-- PLACEMENT DETAILS -->
+
+                    <h3>
+                        Placement Details
+                    </h3>
+
+
+                    <p>
+                        <strong>Location:</strong>
+                        {{ application.opportunity.location }}
+                    </p>
+
+
+                    <p>
+                        <strong>State:</strong>
+                        {{ application.opportunity.state }}
+                    </p>
+
+
+                    <p>
+                        <strong>City:</strong>
+                        {{ application.opportunity.city }}
+                    </p>
+
+
+                    <p>
+                        <strong>Duration:</strong>
+                        {{ application.opportunity.duration }}
+                    </p>
+
+
+                    <p>
+                        <strong>Placed since:</strong>
+                        {{ application.created_at }}
+                    </p>
+
+
+                    <hr>
+
+
+                    <!-- PLACEMENT DATES -->
+
+                    <h3>
+                        Placement Duration
+                    </h3>
+
+                    {% if application.start_date and application.end_date %}
+
+                        <p>
+                            <strong>Start Date:</strong>
+                            {{ application.start_date.strftime("%d %B %Y") }}
+                        </p>
+
+                        <p>
+                            <strong>End Date:</strong>
+                            {{ application.end_date.strftime("%d %B %Y") }}
+                        </p>
+
+                    {% else %}
+
+                        <p>
+                            You haven't set your placement dates yet.
+                        </p>
+
+                    {% endif %}
+
+
+                    <form
+                        method="POST"
+                        action="{{ url_for('student.set_placement_dates', application_id=application.id) }}"
+                        style="margin-top: 15px;">
+
+                        <input type="hidden"
+                               name="csrf_token"
+                               value="{{ csrf_token() }}">
+
+                        <label>Start Date</label>
+
+                        <input
+                            type="date"
+                            name="start_date"
+                            value="{{ application.start_date.isoformat() if application.start_date else '' }}"
+                        >
+
+                        <label style="margin-top: 12px;">End Date</label>
+
+                        <input
+                            type="date"
+                            name="end_date"
+                            value="{{ application.end_date.isoformat() if application.end_date else '' }}"
+                        >
+
+                        <button
+                            type="submit"
+                            class="primary-button"
+                            style="margin-top: 15px; width: 100%;">
+
+                            Save Placement Dates
+
+                        </button>
+
+                    </form>
+
+
+                </div>
+
+
+            {% endfor %}
+
+
+        </div>
+
+
+    {% else %}
+
+
+        <div class="dashboard-card">
+
+            <h2>
+                No Placement Yet
+            </h2>
+
+            <p>
+                You don't have an accepted placement yet. Once a
+                company accepts one of your applications, it will
+                appear here.
+            </p>
+
+            <br>
+
+            <a
+                href="{{ url_for('student.opportunities') }}"
+                class="primary-button">
+
+                Find Opportunities
+
+            </a>
+
+        </div>
+
+
+    {% endif %}
+
+
+</section>
+
+
+</body>
+
+</html>

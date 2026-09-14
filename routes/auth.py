@@ -1,98 +1,151 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
-from flask_login import login_user, logout_user, login_required
-from werkzeug.security import generate_password_hash, check_password_hash
-
+from flask import Blueprint, request, jsonify, current_app
+from flask_jwt_extended import create_access_token
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from models.user import db, User
 
+auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
 
-auth = Blueprint("auth", __name__)
+RESET_TOKEN_MAX_AGE = 1800  # 30 minutes, in seconds
+RESET_SALT = "password-reset-salt"
 
 
-@auth.route("/register", methods=["GET", "POST"])
+def generate_reset_token(email):
+    serializer = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
+    return serializer.dumps(email, salt=RESET_SALT)
+
+
+def verify_reset_token(token):
+    serializer = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
+    try:
+        email = serializer.loads(token, salt=RESET_SALT, max_age=RESET_TOKEN_MAX_AGE)
+    except (SignatureExpired, BadSignature):
+        return None
+    return email
+
+
+@auth_bp.route("/register", methods=["POST"])
 def register():
+    data = request.get_json() or {}
 
-    if request.method == "POST":
+    name = data.get("name")
+    email = data.get("email")
+    password = data.get("password")
+    role = data.get("role", "student")
+    matric_number = data.get("matric_number")
+    company_name = data.get("company_name")
 
-        full_name = request.form["full_name"].strip()
-        email = request.form["email"].strip().lower()
-        password = request.form["password"]
-        role = request.form["role"]
+    if not name or not email or not password:
+        return jsonify({"message": "Name, email and password are required."}), 400
 
-        # Check if email already exists
-        existing_user = User.query.filter_by(email=email).first()
+    if role not in ("student", "company", "admin"):
+        return jsonify({"message": "Invalid role."}), 400
 
-        if existing_user:
-            flash("An account with this email already exists.")
-            return redirect(url_for("auth.register"))
+    existing_user = User.query.filter_by(email=email.lower()).first()
+    if existing_user:
+        return jsonify({"message": "An account with this email already exists."}), 409
 
-        # Create secure password hash
-        hashed_password = generate_password_hash(password)
+    new_user = User(
+        name=name,
+        email=email.lower(),
+        role=role,
+        matric_number=matric_number,
+        company_name=company_name,
+    )
+    new_user.set_password(password)
 
-        # Companies need admin approval before they can post
-        # opportunities. Students are approved automatically.
-        is_approved = False if role == "company" else True
+    db.session.add(new_user)
+    db.session.commit()
 
-        # Create user
-        new_user = User(
-            full_name=full_name,
-            email=email,
-            password=hashed_password,
-            role=role,
-            is_approved=is_approved
-        )
+    access_token = create_access_token(
+        identity=str(new_user.id),
+        additional_claims={"role": new_user.role},
+    )
 
-        db.session.add(new_user)
-        db.session.commit()
-
-        if role == "company":
-            flash(
-                "Registration successful! Your company account "
-                "is pending admin approval before you can post "
-                "opportunities."
-            )
-        else:
-            flash("Registration successful! Please login.")
-
-        return redirect(url_for("auth.login"))
-
-    return render_template("register.html")
+    return jsonify({
+        "message": "Account created successfully.",
+        "token": access_token,
+        "user": new_user.to_dict(),
+    }), 201
 
 
-@auth.route("/login", methods=["GET", "POST"])
+@auth_bp.route("/login", methods=["POST"])
 def login():
+    data = request.get_json() or {}
 
-    if request.method == "POST":
+    email = data.get("email")
+    password = data.get("password")
 
-        email = request.form["email"].strip().lower()
-        password = request.form["password"]
+    if not email or not password:
+        return jsonify({"message": "Email and password are required."}), 400
 
-        user = User.query.filter_by(email=email).first()
+    user = User.query.filter_by(email=email.lower()).first()
+    if not user or not user.check_password(password):
+        return jsonify({"message": "Invalid email or password."}), 401
 
-        if user and check_password_hash(user.password, password):
+    access_token = create_access_token(
+        identity=str(user.id),
+        additional_claims={"role": user.role},
+    )
 
-            login_user(user)
-
-            # Send user to the correct dashboard
-            if user.role == "student":
-                return redirect(url_for("student.dashboard"))
-
-            elif user.role == "company":
-                return redirect(url_for("company.dashboard"))
-
-            elif user.role == "admin":
-                return redirect(url_for("admin.dashboard"))
-
-        flash("Invalid email or password.")
-
-    return render_template("login.html")
+    return jsonify({
+        "message": "Login successful.",
+        "token": access_token,
+        "user": user.to_dict(),
+    }), 200
 
 
-@auth.route("/logout")
-@login_required
-def logout():
+# -------------------- FORGOT PASSWORD --------------------
+# POST /api/auth/forgot-password
+# Body: { "email": "student@example.com" }
+@auth_bp.route("/forgot-password", methods=["POST"])
+def forgot_password():
+    data = request.get_json() or {}
+    email = data.get("email")
 
-    logout_user()
+    if not email:
+        return jsonify({"message": "Email is required."}), 400
 
-    flash("You have been logged out.")
+    user = User.query.filter_by(email=email.lower()).first()
 
-    return redirect(url_for("auth.login"))
+    # Always return the same message whether or not the user exists.
+    # This prevents attackers from using this endpoint to check which emails are registered.
+    generic_response = {
+        "message": "If an account with that email exists, a password reset link has been sent."
+    }
+
+    if not user:
+        return jsonify(generic_response), 200
+
+    token = generate_reset_token(user.email)
+    reset_link = f"https://your-frontend-domain.com/reset-password/{token}"
+
+    # TODO: replace this with real email sending (e.g. Flask-Mail, SendGrid, etc.)
+    # send_email(to=user.email, subject="Reset your password", body=f"Click here: {reset_link}")
+    current_app.logger.info(f"[DEV ONLY] Password reset link for {user.email}: {reset_link}")
+
+    return jsonify(generic_response), 200
+
+
+# -------------------- RESET PASSWORD --------------------
+# POST /api/auth/reset-password/<token>
+# Body: { "new_password": "..." }
+@auth_bp.route("/reset-password/<token>", methods=["POST"])
+def reset_password(token):
+    data = request.get_json() or {}
+    new_password = data.get("new_password")
+
+    if not new_password:
+        return jsonify({"message": "New password is required."}), 400
+
+    email = verify_reset_token(token)
+    if not email:
+        return jsonify({"message": "This reset link is invalid or has expired."}), 400
+
+    user = User.query.filter_by(email=email.lower()).first()
+    if not user:
+        return jsonify({"message": "This reset link is invalid or has expired."}), 400
+
+    user.set_password(new_password)
+    db.session.commit()
+
+    return jsonify({"message": "Password has been reset successfully. You can now log in."}), 200

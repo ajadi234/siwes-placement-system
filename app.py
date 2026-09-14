@@ -1,52 +1,86 @@
-from flask import Flask, jsonify
-from flask_jwt_extended import JWTManager, jwt_required, get_jwt
-from datetime import timedelta
+import os
 
-from models.user import db
-from routes.auth import auth_bp
-from utils.decorators import role_required
+from flask import Flask, render_template
+from flask_login import LoginManager
+from flask_wtf import CSRFProtect
+
+from extensions import mail
+from models.user import db, User
+from models.student_profile import StudentProfile
+from models.company_profile import CompanyProfile
+from models.opportunity import Opportunity
+from models.application import Application
+
+from routes.auth import auth
+from routes.student import student
+from routes.company import company
+from routes.admin import admin
+
 
 app = Flask(__name__)
 
-# --- Config ---
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///siwes.db"  # swap for MySQL/Postgres in production
-app.config["SECRET_KEY"] = "change-this-too-a-real-secret"  # used for password reset tokens
-app.config["JWT_SECRET_KEY"] = "change-this-to-a-real-secret"  # load from .env in real app
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=1)
+# SECRET_KEY comes from the environment in production. The fallback
+# is only for local development.
+app.config["SECRET_KEY"] = os.environ.get(
+    "SECRET_KEY", "dev-only-secret-key-change-me"
+)
 
+# DATABASE_URL is provided automatically by Render/other hosts when
+# a Postgres instance is attached. Falls back to local SQLite.
+db_url = os.environ.get("DATABASE_URL", "sqlite:///siwes.db")
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+app.config["SQLALCHEMY_DATABASE_URI"] = db_url
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+# --- Email configuration (for password reset) ---
+# Set these as real environment variables on your server (PythonAnywhere/
+# Render). Never commit real credentials to GitHub.
+app.config["MAIL_SERVER"] = os.environ.get("MAIL_SERVER", "smtp.gmail.com")
+app.config["MAIL_PORT"] = int(os.environ.get("MAIL_PORT", 587))
+app.config["MAIL_USE_TLS"] = True
+app.config["MAIL_USERNAME"] = os.environ.get("MAIL_USERNAME")  # your Gmail address
+app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD")  # the 16-char App Password
+app.config["MAIL_DEFAULT_SENDER"] = os.environ.get("MAIL_USERNAME")
+
+
+# Database
 db.init_app(app)
-jwt = JWTManager(app)
 
-# --- Register auth routes ---
-app.register_blueprint(auth_bp)
+# Mail
+mail.init_app(app)
 
-# --- Example protected routes ---
+# CSRF protection
+csrf = CSRFProtect(app)
 
-# Any logged-in user (student, company, or admin) can view placements
-@app.route("/api/placements", methods=["GET"])
-@jwt_required()
-def get_placements():
-    claims = get_jwt()
-    return jsonify({"message": f"Hello {claims.get('role')}, here are the placements."})
+# Login manager
+login_manager = LoginManager()
+login_manager.login_view = "auth.login"
+login_manager.init_app(app)
 
 
-# Only admins/coordinators can approve a placement
-@app.route("/api/placements/<int:placement_id>/approve", methods=["POST"])
-@jwt_required()
-@role_required("admin")
-def approve_placement(placement_id):
-    return jsonify({"message": f"Placement {placement_id} approved."})
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 
-# Only companies can post available slots
-@app.route("/api/companies/slots", methods=["POST"])
-@jwt_required()
-@role_required("company")
-def post_slot():
-    return jsonify({"message": "Slot posted."})
+# Register blueprints
+app.register_blueprint(auth)
+app.register_blueprint(student)
+app.register_blueprint(company)
+app.register_blueprint(admin)
+
+
+# Home page
+@app.route("/")
+def home():
+    return render_template("index.html")
+
+
+# Create database tables if they don't exist yet.
+with app.app_context():
+    db.create_all()
 
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()  # creates tables based on models
     app.run(debug=True)

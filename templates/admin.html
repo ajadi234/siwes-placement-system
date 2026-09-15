@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Dashboard - SIWESConnect</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+
+        <div class="logo">
+            SIWES<span>Connect</span>
+        </div>
+
+        <div class="nav-links">
+
+            <span>
+                Welcome, {{ user.full_name }}
+            </span>
+
+            <a href="{{ url_for('auth.logout') }}"
+               class="nav-button">
+                Logout
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- Dashboard -->
+    <section class="dashboard">
+
+        <h1>Admin Dashboard</h1>
+
+        <p>
+            Welcome back, {{ user.full_name }}.
+            Manage students, companies and placements from here.
+        </p>
+
+
+        <div class="dashboard-card">
+
+            <div class="feature-icon">
+                📝
+            </div>
+
+            <h3>Applications</h3>
+
+            <p>
+                Review submitted applications and
+                approve or reject placements.
+            </p>
+
+            <br>
+
+            <a href="{{ url_for('admin.applications') }}"
+               class="primary-button">
+                Review Applications
+            </a>
+
+        </div>
+
+
+        <div class="dashboard-card">
+
+            <div class="feature-icon">
+                🎓
+            </div>
+
+            <h3>Students</h3>
+
+            <p>
+                View registered students and their
+                placement status.
+            </p>
+
+            <br>
+
+            <a href="{{ url_for('admin.students') }}"
+               class="primary-button">
+                View Students
+            </a>
+
+        </div>
+
+
+        <div class="dashboard-card">
+
+            <div class="feature-icon">
+                🏢
+            </div>
+
+            <h3>Companies</h3>
+
+            <p>
+                View registered companies and the
+                opportunities they've posted.
+            </p>
+
+            <br>
+
+            <a href="{{ url_for('admin.companies') }}"
+               class="primary-button">
+                View Companies
+            </a>
+
+        </div>
+
+
+        <div class="dashboard-card">
+
+            <div class="feature-icon">
+                📊
+            </div>
+
+            <h3>Overview</h3>
+
+            <p>
+                Summary statistics on students,
+                companies and placements.
+            </p>
+
+        </div>
+
+    </section>
+
+</body>
+
+</html>
